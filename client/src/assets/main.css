@@ -1,0 +1,10 @@
+@import './base.css';
+
+* {
+  color: #fff;
+  font-size: 1.15rem;
+}
+
+body {
+  padding: 1rem;;
+}
