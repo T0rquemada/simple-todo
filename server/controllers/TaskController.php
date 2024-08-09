@@ -11,15 +11,11 @@ class TaskController {
         $this->model = new Task($pdo);
     }
 
-    public function create() {
-        $input = file_get_contents('php://input');
-        $data = json_decode($input, true);
-
+    public function create($data) {
         $this->model->create($data);
     }
 
-    public function get_tasks() {
-        $jwt = $_GET['jwt'];
+    public function get_tasks($jwt) {
         $this->model->get_tasks($jwt);
     }
 
