@@ -17,7 +17,6 @@ $options = [
 ];
 
 try {
-    # Connection
     $pdo = new PDO($data_source_name, $user, $pass, $options);
 } catch (PDOException $e) {
     throw new PDOException($e->getMessage(), (int)$e->getCode());

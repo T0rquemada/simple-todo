@@ -36,17 +36,11 @@ class UserController {
         $this->model = new User($pdo);
     }
 
-    public function registration() {
-        $input = file_get_contents('php://input');
-        $userdata = json_decode($input, true);
-
+    public function registration($userdata) {
         $this->model->create($userdata);
     }
 
-    public function login() {
-        $input = file_get_contents('php://input');
-        $userdata = json_decode($input, true);
-
+    public function login($userdata) {
         $this->model->login($userdata);
     }
 

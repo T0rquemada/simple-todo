@@ -29,15 +29,16 @@ class Task {
 
     public function create($data) {
         $correct_fields = isset($data['jwt'], $data['title'], $data['description']);
+
         if (!$correct_fields) {
             $response = [ 'code' => 400, 'message' => 'Invalid task data' ];
         } else {
-            # Inserting task in db
             $author_id = getUserIdFromJWT($data['jwt'], $this->secretKey);
             $title = $data['title'];
             $description = $data['description'];
             $completed = 0; // false
 
+            # Inserting task in db
             $stmt = $this->pdo->prepare('INSERT INTO tasks (author_id, title, description, completed) VALUES (?, ?, ?, ?)');
             try {
                 $result = $stmt->execute([$author_id, $title, $description, $completed]);
@@ -73,7 +74,6 @@ class Task {
         $correct_fields = isset($data['task_id'], $data['complete']);
         if (!$correct_fields) {
             $response = [ 'code' => 400, 'message' => "Invalid data: 'completed' must be setted!" ];
-            echo json_encode($response);
         } else {
             $completed = $data['complete'];
             $task_id = $data['task_id'];

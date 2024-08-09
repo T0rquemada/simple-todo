@@ -120,11 +120,11 @@ class User {
         if (!$this->validateUserdata($userdata) && $correct_fields) {
             $response = [ 'code' => 400, 'message' => 'Invalid user data' ];
         } else {
-            # Inserting user in db
             $name = $userdata['username'];
             $hashed_pass = password_hash($userdata['password'], PASSWORD_DEFAULT); # Hash user password
             $email = $userdata['email'];
 
+            # Inserting user in db
             $stmt = $this->pdo->prepare('INSERT INTO users (username, password, email) VALUES (?, ?, ?)');
             try {
                 $result = $stmt->execute([$name, $hashed_pass, $email]);
@@ -165,7 +165,6 @@ class User {
     }
 
     public function getUsername($id) {
-        $response;
         $stmt = $this->pdo->prepare('SELECT username FROM users WHERE id=?;');
         try {
             $stmt->execute([$id]);

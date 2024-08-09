@@ -19,10 +19,7 @@ class TaskController {
         $this->model->get_tasks($jwt);
     }
 
-    public function update_task() {
-        $input = file_get_contents('php://input');
-        $data = json_decode($input, true);
-
+    public function update_task($data) {
         $this->model->update($data);
     }
 }

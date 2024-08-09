@@ -13,10 +13,13 @@ class UserRouter {
         $uri = $_SERVER['REQUEST_URI'];
         $method = $_SERVER['REQUEST_METHOD'];
 
+        $input = file_get_contents('php://input');
+        $userdata = json_decode($input, true);
+
         if ($method === 'POST' && $uri === '/users/registration') {
-            $this->controller->registration();
+            $this->controller->registration($userdata);
         } else if ($method === 'POST' && $uri === '/users/login') {
-            $this->controller->login();
+            $this->controller->login($userdata);
         } else if ($method === 'POST' && $uri === '/users/autologin') {
             $this->controller->autologin();
         } else if ($method === 'GET' && strpos($uri, '/users/get_username') === 0) {
