@@ -30,11 +30,9 @@ class User {
 
     private function generateJWT($email, $password, $user_id) {
         $issuedAt = time();
-        $expiration = $issuedAt + 86400; // Token valid for 1 day
 
         $payload = [
             'iat' => $issuedAt,
-            'exp' => $expiration,
             'email' => $email,
             'password' => $password,
             'user_id' => $user_id
