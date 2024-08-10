@@ -1,5 +1,5 @@
 <script setup>
-    import { ref, onMounted } from 'vue';
+    import { ref } from 'vue';
 
     const props = defineProps({
         taskId: Number,
@@ -9,52 +9,49 @@
         completed: Number
     });
 
-    async function getUsername(userId) {
-        const response = await fetch (`http://localhost:5174/users/get_username?user_id=${userId}`, {
-            method: 'GET',
-            headers: { 'Content-Type' : 'application/json' }
-        });
-
-        if (!response.ok) throw new Error('Network response was not ok');
-
-        const data = await response.json();
-
-        if (!data) throw new Error('Error while fetching username! Empty response');
-        if (data.code !== 200) throw new Error(`Error while fetching username: ${data.message}`);
-        
-        console.log('Fetching tasks response:', data);
-
-        username.value = data.username;
-    }
-
     async function updateCompleteRequest(taskID, complete) {
-        const response = await fetch('http://localhost:5174/tasks/update_complete', {
-            method: 'PUT',
-            headers: { 'Content-Type' : 'application/json' },
-            body: JSON.stringify({task_id: taskID, complete: complete})
-        });
+        try {
+            console.log(complete);
+            const jwt = localStorage.getItem('JWT');
+            const response = await fetch('http://localhost:5174/tasks/update_complete', {
+                method: 'PUT',
+                headers: { 'Content-Type' : 'application/json' },
+                body: JSON.stringify({task_id: taskID, complete: complete, jwt: jwt})
+            });
 
-        if (!response.ok) throw new Error('Network response was not ok');
+            const data = await response.json();
 
-        const data = await response.json();
+            if (!data) { 
+                alert('Error while updating complete status task! Empty response');
+                return false;
+            }
 
-        if (!data) throw new Error('Error while updating complete status task! Empty response');
-        if (data.code !== 200) throw new Error(`Error while updating complete status task: ${data.message}`);
-        console.log('Response while updating task status: ', data);
+            if (data.code !== 200) { 
+                alert(`Error while updating complete status task: ${data.message}`);
+                return false;
+            }
+            
+            console.log('Response while updating task status: ', data);
+            return true;
+        } catch (err) {
+            console.error(err);
+        }
     }
 
-    function setComplete() {
+    async function setComplete() {
         if (isComplete.value === 1) { isComplete.value = 0; }
         else if (isComplete.value === 0) { isComplete.value = 1; }
-        updateCompleteRequest(props.taskId, isComplete.value);
+
+        let result = await updateCompleteRequest(props.taskId, isComplete.value);
+
+        // If request unsuccessful, return previous value
+        if (!result) {
+            if (isComplete.value === 1) { isComplete.value = 0; }
+            else if (isComplete.value === 0) { isComplete.value = 1; }
+        }
     }
 
     const isComplete = ref(props.completed);
-    const username = ref('');
-
-    onMounted(() => {
-        getUsername(props.userId);
-    });
 </script>
 
 <template>
@@ -71,7 +68,7 @@
         </div>
         
         <div class="task__footer">
-            <div class="task__creator">{{ 'Username: ' + username }}</div>
+            
         </div>
     </div>
 </template>
