@@ -19,7 +19,7 @@ class TaskController {
         $this->model->get_tasks($jwt);
     }
 
-    public function update_task($data) {
-        $this->model->update($data);
+    public function update_complete($data) {
+        $this->model->update_complete($data);
     }
 }

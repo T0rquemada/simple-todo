@@ -14,13 +14,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 require_once './routers/UserRouter.php';
 require_once './routers/TaskRouter.php';
 
-function getRoute($uri) {
+function get_route($uri) {
     $path = parse_url($uri, PHP_URL_PATH);
     $segments = explode('/', trim($path, '/'));
     return $segments[0] ?? '';
 }
 
-$route = getRoute($_SERVER['REQUEST_URI']);
+$route = get_route($_SERVER['REQUEST_URI']);
 
 switch ($route) {
     case 'users':

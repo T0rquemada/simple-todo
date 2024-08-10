@@ -52,8 +52,8 @@ class UserController {
         } else echo json_encode([ 'code' => 400, 'message' => 'Invalid jwt' ]);
     }
 
-    public function getUsername() {
+    public function get_username() {
         $user_id = $_GET['user_id'];
-        $this->model->getUsername($user_id);
+        $this->model->get_username($user_id);
     }
 }

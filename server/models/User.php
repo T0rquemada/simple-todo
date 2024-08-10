@@ -164,7 +164,7 @@ class User {
         else { $this->login($userdata); }
     }
 
-    public function getUsername($id) {
+    public function get_username($id) {
         $stmt = $this->pdo->prepare('SELECT username FROM users WHERE id=?;');
         try {
             $stmt->execute([$id]);

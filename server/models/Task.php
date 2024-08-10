@@ -70,7 +70,7 @@ class Task {
         echo json_encode($response);
     }
 
-    public function update($data) {
+    public function update_complete($data) {
         $correct_fields = isset($data['task_id'], $data['complete']);
         if (!$correct_fields) {
             $response = [ 'code' => 400, 'message' => "Invalid data: 'completed' must be setted!" ];

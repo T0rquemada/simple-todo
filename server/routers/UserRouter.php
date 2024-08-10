@@ -23,7 +23,7 @@ class UserRouter {
         } else if ($method === 'POST' && $uri === '/users/autologin') {
             $this->controller->autologin();
         } else if ($method === 'GET' && strpos($uri, '/users/get_username') === 0) {
-            $this->controller->getUsername();
+            $this->controller->get_username();
         } else {
             header('HTTP/1.1 404 Not Found');
             echo json_encode(['code' => 404, 'message' => 'Route not found']);

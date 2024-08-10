@@ -28,7 +28,7 @@
     }
 
     async function updateCompleteRequest(taskID, complete) {
-        const response = await fetch('http://localhost:5174/tasks/update_task', {
+        const response = await fetch('http://localhost:5174/tasks/update_complete', {
             method: 'PUT',
             headers: { 'Content-Type' : 'application/json' },
             body: JSON.stringify({task_id: taskID, complete: complete})
@@ -78,6 +78,7 @@
 
 <style scoped>
     .task__container {
+        width: 60%;
         margin: 1rem;
         padding: 0.5rem;
         border: 2px solid grey;
