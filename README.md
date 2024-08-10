@@ -39,7 +39,9 @@ You need two terminal tabs, to lauch web page, first for client, second for php 
 1. ```cd client```
 2. ```php -S localhost:5174 -t .```
 
-## Used packages
+## Used
+- For client 
+    - [Vue.js](https://vuejs.org/)
 - For server
-    1. [firebase/php-jwt](https://github.com/firebase/php-jwt)
-    2. [vlucas/phpdotenv](https://github.com/vlucas/phpdotenv)
+    - [firebase/php-jwt](https://github.com/firebase/php-jwt)
+    - [vlucas/phpdotenv](https://github.com/vlucas/phpdotenv)
