@@ -16,12 +16,10 @@ class User {
     }
 
     private function getUserId($email) {
-        
         $stmt = $this->pdo->prepare('SELECT id FROM users WHERE email=?;');
         try {
             $result = $stmt->execute([$email]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        
             if ($row && isset($row['id'])) { return $row['id']; } 
             else { return null; }
         } catch (PDOException $e) {
@@ -117,6 +115,7 @@ class User {
     public function create($userdata) {
         $correct_fields = isset($userdata['username'], $userdata['password'], $userdata['email']);
         if (!$this->validateUserdata($userdata) && $correct_fields) {
+            http_response_code(400); 
             $response = [ 'code' => 400, 'message' => 'Invalid user data' ];
         } else {
             $name = $userdata['username'];
@@ -129,8 +128,11 @@ class User {
                 $result = $stmt->execute([$name, $hashed_pass, $email]);
                 $user_id = $this->getUserId($email);
                 $token = $this->generateJWT($email, $userdata['password'], $user_id);
+                
+                http_response_code(200); 
                 $response = [ 'code' => 200, 'message' => 'User inserted successfully', 'jwt' => $token ];
             } catch (PDOException $e) {
+                http_response_code(500); 
                 $response = [ 'code' => 500, 'message' => 'Database error: ' . $e->getMessage() ];
             }
         }
@@ -142,15 +144,25 @@ class User {
         $correct_fields = isset($userdata['password'], $userdata['email']);
 
         if (!$this->validateUserdata($userdata) && $correct_fields) {
+            http_response_code(400); 
             $response = [ 'code' => 400, 'message' => 'Invalid user data' ];
         } else {
-            if ($this->user_already_exist('email', $userdata['email'])) {
+            $email = $userdata['email'];
+            if ($this->user_already_exist('email', $email)) {
                 if ($this->verify_user($userdata)) {
                     $user_id = $this->getUserId($email);
                     $token = $this->generateJWT($userdata['email'], $userdata['password'], $user_id);
+                    
+                    http_response_code(200); 
                     $response = [ 'code' => 200, 'message' => 'User logged successfully', 'jwt' => $token ];
-                } else $response = [ 'code' => 400, 'message' => 'Incorrect data while sign in'];
-            } else $response = [ 'code' => 500, 'message' => 'User does not exist!'];
+                } else {
+                    http_response_code(400); 
+                    $response = [ 'code' => 400, 'message' => 'Incorrect data while sign in'];
+                }
+            } else {
+                http_response_code(500); 
+                $response = [ 'code' => 500, 'message' => 'User does not exist!'];
+            }
         }
 
         echo json_encode($response);
@@ -169,8 +181,11 @@ class User {
             $stmt->execute([$id]);
             $username = $stmt->fetch(PDO::FETCH_ASSOC);
             $username = $username['username'];
+            
+            http_response_code(200); 
             $response = ['code' => 200, 'message' => 'Username fetched succesfully!', 'username' => $username];
         } catch (PDOException $e) {
+            http_response_code(400); 
             $response = ['code' => 400, 'message' => 'Username not finded!', 'username' => null];
         }
 
