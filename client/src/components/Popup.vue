@@ -58,40 +58,25 @@
         return [true];
     }
 
-    function registerRequest(userData) {
-        fetch('http://localhost:5174/users/registration', {
-        method: 'POST',
-        headers: { 'Content-Type' : 'application/json' },
-        body: JSON.stringify(userData)})
-        .then(response => response.json())
-        .then((data) => {
-            if (!data) throw new Error('Error while registration! Empty response');
-            if (data.code !== 200) throw new Error(`Error while registration: ${data.message}`);
+    async function signRequest(route, userData) {
+        try {
+            const response = await fetch(`http://localhost:5174/users/${route}`, {
+                method: 'POST',
+                headers: { 'Content-Type' : 'application/json' },
+                body: JSON.stringify(userData)
+            })
+            
+            const data = await response.json();
+
+
+            if (!data) throw new Error(`Error while ${route}! Empty response`);
+            if (data.code !== 200) throw new Error(`Error while ${route}: ${data.message}`);
 
             console.log('Response from server while registration: ', data);
 
             localStorage.setItem('JWT', data.jwt);
             emit('setAuthenticated', true);
-        })
-        .catch(err => console.error(err))
-    }
-
-    function loginRequest(userData) {
-        fetch('http://localhost:5174/users/login', {
-        method: 'POST',
-        headers: { 'Content-Type' : 'application/json' },
-        body: JSON.stringify(userData)})
-        .then(response => response.json())
-        .then((data) => {
-            if (!data) throw new Error('Error while sign in! Empty response');
-            if (data.code !== 200) throw new Error(`Error while sign in: ${data.message}`);
-
-            console.log(data);
-
-            localStorage.setItem('JWT', data.jwt);
-            emit('setAuthenticated', true);
-        })
-        .catch(err => console.error(err))
+        } catch (err) { alert(err); }
     }
 
     function createTaskRequest(taskData) {
@@ -137,8 +122,8 @@
         } else {
             console.log('Form submitted, user data:', data);
 
-            if (props.content === 'sign up') registerRequest(data);
-            if (props.content === 'sign in') loginRequest(data);
+            if (props.content === 'sign up') signRequest('registration', data);
+            if (props.content === 'sign in') signRequest('login', data);
             if (props.content === 'create task') createTaskRequest(data);
 
             emit('close');
@@ -197,6 +182,8 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
+        background-color: #000;
+        border-radius: 5px;
     }
 
     .popup__part {

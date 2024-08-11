@@ -16,13 +16,14 @@ class User {
     }
 
     private function getUserId($email) {
+        
         $stmt = $this->pdo->prepare('SELECT id FROM users WHERE email=?;');
         try {
             $result = $stmt->execute([$email]);
-            
-            if (is_null($result)) return null;
-
-            return $result;
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+            if ($row && isset($row['id'])) { return $row['id']; } 
+            else { return null; }
         } catch (PDOException $e) {
             return null;
         }
