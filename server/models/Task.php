@@ -118,4 +118,27 @@ class Task {
 
         echo json_encode($response);
     }
+    
+    public function delete($data) {
+        $correct_fields = isset($data['task_id']);
+
+        if (!$correct_fields) {
+            http_response_code(400); 
+            $response = [ 'code' => 400, 'message' => "Invalid data: 'task_id' must be setted!" ];
+        } else {
+            $task_id = $data['task_id'];
+
+            $stmt = $this->pdo->prepare('DELETE FROM tasks WHERE id=?;');
+            try {
+                $result = $stmt->execute([$task_id]);
+                http_response_code(200); 
+                $response = ['code' => 200, 'message' => "Task deleted!"];
+            } catch (PDOException $e) {
+                http_response_code(500); 
+                $response = [ 'code' => 500, 'message' => 'Database error: ' . $e->getMessage() ];
+            }
+       }
+
+        echo json_encode($response);
+    }
 }

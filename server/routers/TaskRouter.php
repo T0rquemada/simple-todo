@@ -32,6 +32,9 @@ class TaskRouter {
         } else if ($method === 'PUT' && $uri === '/tasks/update_complete') {
             $this->middleware->handle($data['jwt']);
             $this->controller->update_complete($data);
+        } else if ($method === 'DELETE' && $uri === '/tasks/delete_task') {
+            $this->middleware->handle($data['jwt']);
+            $this->controller->delete($data);
         } else {
             header('HTTP/1.1 404 Not Found');
             echo json_encode(['code' => 404, 'message' => 'Route not found']);

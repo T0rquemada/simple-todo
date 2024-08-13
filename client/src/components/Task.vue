@@ -51,14 +51,52 @@
         }
     }
 
+    function setShowModal() {
+        showModal.value = !showModal.value;
+    }
+
+    async function deleteRequest() {
+        const jwt = localStorage.getItem('JWT');
+        const taskId = props.taskId;
+
+        const response = await fetch('http://localhost:5174/tasks/delete_task', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                task_id: taskId,
+                jwt: jwt
+            })
+        });
+
+        if (!response.ok) { throw new Error('Network response was not ok'); }
+
+        const data = await response.json();
+
+        if (!data || data.code !== 200) throw new Error(`Error while deleting tasks: ${data.message || 'empty response'}`);
+        
+        console.log('Deleting tasks response:', data);
+    }
+
+    async function deleteTask() {
+        await deleteRequest();
+        showModal.value = false;
+        window.location.reload();
+    }
+
+    const showModal = ref(false);
     const isComplete = ref(props.completed);
 </script>
 
 <template>
     <div class="task__container">
         <div class="task__header">
-            <div class="task__complete" @click="setComplete">
-                <div v-if="isComplete === 1">X</div>
+            <div @click="setShowModal" class="task__settings">...</div>
+            <div v-if="showModal === true" class="task__settings__modal__container">
+                <div class="task__settings__option">Edit</div>
+                <div @click="deleteTask" class="task__settings__option">Delete</div>
+            </div>
+            <div @click="setComplete" class="task__complete">
+                <div v-if="isComplete === 1" class="task__complete__value">X</div>
             </div>
             <div class="task__title">{{ props.title }}</div>
         </div>
@@ -88,7 +126,7 @@
         align-items: center;
     }
 
-    .task__header>* {
+    .task__title {
         margin: 0 0.5rem;
     }
 
@@ -97,10 +135,35 @@
         height: 1.85rem;
         text-align: center;
         border: 1px solid grey;
+        cursor: pointer;
+    }
+
+    .task__complete__value {
+        user-select: none;
     }
 
     .task__title {
         font-size: 1.25rem;
         font-weight: 700;
+    }
+
+    .task__settings {
+        width: fit-content;
+        height: fit-content;
+        transform: rotate(90deg);
+        position: relative;
+        cursor: pointer;
+    }
+
+    .task__settings__modal__container {
+        padding: 0.45rem;
+        position: absolute;
+        margin: 5rem 0 0 -2rem;
+        background-color: rgb(59, 56, 56);
+        border-radius: 5px;
+    }
+
+    .task__settings__option {
+        cursor: pointer;
     }
 </style>
