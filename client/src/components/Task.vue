@@ -9,6 +9,33 @@
         completed: Number
     });
 
+    async function request(route, method, body) {
+        try {
+            const response = await fetch(`http://localhost:5174/tasks/${route}`, {
+                method: method,
+                headers: { 'Content-Type' : 'application/json' },
+                body: JSON.stringify(body)
+            });
+
+            const data = await response.json();
+
+            if (!data) { 
+                alert(`Error while ${route}! Empty response`);
+                return false;
+            }
+
+            if (data.code !== 200) { 
+                alert(`Error while ${route}, message: ${data.message}`);
+                return false;
+            }
+            
+            console.log(`Response while ${route} status: ${data}`);
+            return true;
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     async function updateCompleteRequest(taskID, complete) {
         try {
             console.log(complete);
@@ -42,7 +69,10 @@
         if (isComplete.value === 1) { isComplete.value = 0; }
         else if (isComplete.value === 0) { isComplete.value = 1; }
 
-        let result = await updateCompleteRequest(props.taskId, isComplete.value);
+        //let result = await updateCompleteRequest(props.taskId, isComplete.value);
+        const jwt = localStorage.getItem('JWT');
+        const body = { task_id: props.taskId, complete: isComplete.value, jwt: jwt };
+        const result = await request('update_complete', 'PUT', body);
 
         // If request unsuccessful, return previous value
         if (!result) {
@@ -56,9 +86,6 @@
     }
 
     async function deleteRequest() {
-        const jwt = localStorage.getItem('JWT');
-        const taskId = props.taskId;
-
         const response = await fetch('http://localhost:5174/tasks/delete_task', {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
@@ -78,7 +105,12 @@
     }
 
     async function deleteTask() {
-        await deleteRequest();
+        const jwt = localStorage.getItem('JWT');
+        const taskId = props.taskId;
+        const body = { task_id: taskId, jwt: jwt };
+
+        await request('delete_task', 'DELETE', body);
+        
         showModal.value = false;
         window.location.reload();
     }
