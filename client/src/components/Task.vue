@@ -36,40 +36,10 @@
         }
     }
 
-    async function updateCompleteRequest(taskID, complete) {
-        try {
-            console.log(complete);
-            const jwt = localStorage.getItem('JWT');
-            const response = await fetch('http://localhost:5174/tasks/update_complete', {
-                method: 'PUT',
-                headers: { 'Content-Type' : 'application/json' },
-                body: JSON.stringify({task_id: taskID, complete: complete, jwt: jwt})
-            });
-
-            const data = await response.json();
-
-            if (!data) { 
-                alert('Error while updating complete status task! Empty response');
-                return false;
-            }
-
-            if (data.code !== 200) { 
-                alert(`Error while updating complete status task: ${data.message}`);
-                return false;
-            }
-            
-            console.log('Response while updating task status: ', data);
-            return true;
-        } catch (err) {
-            console.error(err);
-        }
-    }
-
     async function setComplete() {
         if (isComplete.value === 1) { isComplete.value = 0; }
         else if (isComplete.value === 0) { isComplete.value = 1; }
 
-        //let result = await updateCompleteRequest(props.taskId, isComplete.value);
         const jwt = localStorage.getItem('JWT');
         const body = { task_id: props.taskId, complete: isComplete.value, jwt: jwt };
         const result = await request('update_complete', 'PUT', body);
@@ -85,24 +55,6 @@
         showModal.value = !showModal.value;
     }
 
-    async function deleteRequest() {
-        const response = await fetch('http://localhost:5174/tasks/delete_task', {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                task_id: taskId,
-                jwt: jwt
-            })
-        });
-
-        if (!response.ok) { throw new Error('Network response was not ok'); }
-
-        const data = await response.json();
-
-        if (!data || data.code !== 200) throw new Error(`Error while deleting tasks: ${data.message || 'empty response'}`);
-        
-        console.log('Deleting tasks response:', data);
-    }
 
     async function deleteTask() {
         const jwt = localStorage.getItem('JWT');
@@ -110,7 +62,7 @@
         const body = { task_id: taskId, jwt: jwt };
 
         await request('delete_task', 'DELETE', body);
-        
+
         showModal.value = false;
         window.location.reload();
     }
@@ -198,4 +150,15 @@
     .task__settings__option {
         cursor: pointer;
     }
+
+    @media (max-width: 45rem) {
+    .task__header {
+        flex-direction: column; 
+        align-items: flex-start; 
+    }
+
+    .task__title {
+        margin: 0.5rem 0 0; 
+    }
+}
 </style>
