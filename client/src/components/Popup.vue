@@ -41,7 +41,7 @@
 
     function validateUserdata(email, password, username=undefined) {
 
-        if (email.includes(' ')) return [false, "Email can't contein spaces!"];
+        if (email.includes(' ')) return [false, "Email can't contain spaces!"];
         if (password.includes(' ')) return [false, "Password can't contein spaces!"];
 
         //if (!email.includes('@')) return [false, "Email must contain '@'!"];
@@ -53,7 +53,6 @@
 
     function validateTaskdata(title) {
         if (title.length < 3) return [false, 'Task title must be longer than 2 characters!'];
-        if (title.includes(' ')) return [false, "Email can't contein spaces!"];
 
         return [true];
     }
@@ -66,8 +65,9 @@
                 body: JSON.stringify(userData)
             })
             
-            const data = await response.json();
+            if (!response.ok) { throw new Error('Network response was not ok'); }
 
+            const data = await response.json();
 
             if (!data) throw new Error(`Error while ${route}! Empty response`);
             if (data.code !== 200) throw new Error(`Error while ${route}: ${data.message}`);
@@ -79,19 +79,24 @@
         } catch (err) { alert(err); }
     }
 
-    function createTaskRequest(taskData) {
-        fetch('http://localhost:5174/tasks/create_task', {
-        method: 'POST',
-        headers: { 'Content-Type' : 'application/json' },
-        body: JSON.stringify(taskData)})
-        .then(response => response.json())
-        .then((data) => {
+    async function createTaskRequest(taskData) {
+        try {
+            const response = await fetch('http://localhost:5174/tasks/create_task', {
+                method: 'POST',
+                headers: { 'Content-Type' : 'application/json' },
+                body: JSON.stringify(taskData)
+            })
+
+            if (!response.ok) { throw new Error('Network response was not ok'); }
+
+            const data = await response.json();
+
             if (!data) throw new Error('Error while creating task! Empty response');
             if (data.code !== 200) throw new Error(`Error while creating task: ${data.message}`);
 
             console.log('Response from server while creating task: ', data);
-        })
-        .catch(err => console.error(err))
+            window.location.reload();
+        } catch (err) { console.error(err)} 
     }
 
     function handleSubmit() {

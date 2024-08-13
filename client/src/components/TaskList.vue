@@ -8,7 +8,14 @@
             headers: { 'Content-Type' : 'application/json' }
         });
 
-        if (!response.ok) throw new Error('Network response was not ok');
+        if (!response.ok) {
+            const errorData = await response.json();
+
+            if (errorData.code === 404) { console.error(errorData.message); } 
+            else { alert(errorData.message); }
+
+            throw new Error('Network response was not ok');
+        }
 
         const data = await response.json();
 
@@ -56,4 +63,10 @@
     </Suspense>
 </template>
 
-<style scoped></style>
+<style scoped>
+.task__list__container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+</style>
