@@ -27,31 +27,37 @@
     contentPopup.value = value;
   }
 
-async function autologinRequest() {
-  try {
-    const jwt = localStorage.getItem('JWT');
-    if (!jwt) {console.log('JWT not finded!'); return;}
-    
-    const response = await fetch('http://localhost:5174/users/autologin', {
-      method: 'POST',
-      headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${jwt}`
+  async function autologinRequest() {
+    try {
+      const jwt = localStorage.getItem('JWT');
+      if (!jwt) {
+        console.log('JWT not finded!'); 
+        throw new Error('JWT not found!');
       }
-    });
+      
+      const response = await fetch('http://localhost:5174/users/autologin', {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${jwt}`
+        }
+      });
 
-    if (!response.ok) throw new Error('Network response was not ok');
+      if (!response.ok) throw new Error('Network response was not ok');
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (!data) throw new Error('Error while registration! Empty response');
-    if (data.code !== 200) throw new Error(`Error while registration: ${data.message}`);
-    
-    console.log('Auto login response:', data);
+      if (!data) throw new Error('Error while registration! Empty response');
+      if (data.code !== 200) throw new Error(`Error while registration: ${data.message}`);
+      
+      console.log('Auto login response:', data);
 
-    setAuthenticated(true);
-  } catch (error) { console.error('Auto login failed:', error); }
-}
+      setAuthenticated(true);
+    } catch (err) { 
+      console.error('Auto login failed:', err); 
+      alert(err.message);
+    }
+  }
 
   onMounted(() => {
     autologinRequest();
