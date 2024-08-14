@@ -35,6 +35,8 @@
             if (!jwt) throw new Error('JWT not exist!');
 
             let fetchedTasks = await getTasks(jwt);
+            if (fetchedTasks === undefined) return; // If tasks not found, end proccess
+
             tasks.value = fetchedTasks;
 
             console.log(tasks.value);

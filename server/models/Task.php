@@ -81,8 +81,8 @@ class Task {
                         $response = ['code' => 200, 'message' => 'Tasks fetched successfully', 'tasks' => $tasks
                         ];
                     } else {
-                        http_response_code(404); 
-                        $response = [ 'code' => 404, 'message' => 'No tasks found for this user.' ];
+                        http_response_code(200); 
+                        $response = [ 'code' => 200, 'message' => 'No tasks found for this user.' ];
                     }
                 } catch (PDOException $e) {
                     http_response_code(500); 
