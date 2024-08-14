@@ -118,6 +118,31 @@ class Task {
 
         echo json_encode($response);
     }
+
+    public function edit_task($data) {
+        $correct_fields = isset($data['task_id'], $data['title'], $data['description']);
+        if (!$correct_fields) {
+            http_response_code(400); 
+            $response = [ 'code' => 400, 'message' => "Invalid data: 'title', 'description' and 'task_id' must be setted!" ];
+        } else {
+            $task_id = $data['task_id'];
+            $title = $data['title'];
+            $desc = $data['description'];
+
+            $stmt = $this->pdo->prepare('UPDATE tasks SET title=?, description=? WHERE id=?;');
+            try {
+                $result = $stmt->execute([$title, $desc, $task_id]);
+                
+                http_response_code(200); 
+                $response = ['code' => 200, 'message' => "Task edited!"];
+            } catch (PDOException $e) {
+                http_response_code(500); 
+                $response = [ 'code' => 500, 'message' => 'Database error: ' . $e->getMessage() ];
+            }
+       }
+
+        echo json_encode($response);
+    }
     
     public function delete($data) {
         $correct_fields = isset($data['task_id']);

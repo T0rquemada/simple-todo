@@ -23,6 +23,10 @@ class TaskController {
         $this->model->update_complete($data);
     }
 
+    public function edit_task($data) {
+        $this->model->edit_task($data);
+    }
+
     public function delete($data) {
         $this->model->delete($data);
     }
