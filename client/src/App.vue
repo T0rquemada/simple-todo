@@ -8,6 +8,7 @@
   const isAuthenticated = ref(false);
   const isPopupVisible = ref(false);
   const contentPopup = ref('');
+  const taskId = ref(0);
 
   function showPopup() {
     isPopupVisible.value = true;
@@ -25,6 +26,11 @@
   function setContentPopup(value) {
     console.log(`setContentPopup: ${value}`);
     contentPopup.value = value;
+  }
+
+  function setTaskid(value) {
+    console.log(`setTaskid: ${value}`);
+    taskId.value = value;
   }
 
   async function autologinRequest() {
@@ -79,10 +85,17 @@
     :isAuthenticated='isAuthenticated' 
     @setAuthenticated='setAuthenticated'
     @close="closePopup" 
+    :taskId='taskId' 
+    @setTaskid='setTaskid'
   />
 
   <main v-if="isAuthenticated">
-    <TaskList />
+      <TaskList 
+      @showPopup="showPopup"
+      @setContentPopup="setContentPopup"
+      :contentPopup="contentPopup"
+      @setTaskid='setTaskid'
+    />
   </main>
   
 </template>

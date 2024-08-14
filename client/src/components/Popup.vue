@@ -1,10 +1,12 @@
 <script setup>
     import { ref, onMounted, onUnmounted } from 'vue';
+    import { request } from '../api/request.js';
 
     const props = defineProps({
         isVisible: Boolean,
         content: String,
-        isAuthenticated: Boolean
+        isAuthenticated: Boolean,
+        taskId: Number
     });
 
     const emit = defineEmits(['close', 'setAuthenticated']);
@@ -79,26 +81,6 @@
         } catch (err) { alert(err); }
     }
 
-    async function createTaskRequest(taskData) {
-        try {
-            const response = await fetch('http://localhost:5174/tasks/create_task', {
-                method: 'POST',
-                headers: { 'Content-Type' : 'application/json' },
-                body: JSON.stringify(taskData)
-            })
-
-            if (!response.ok) { throw new Error('Network response was not ok'); }
-
-            const data = await response.json();
-
-            if (!data) throw new Error('Error while creating task! Empty response');
-            if (data.code !== 200) throw new Error(`Error while creating task: ${data.message}`);
-
-            console.log('Response from server while creating task: ', data);
-            window.location.reload();
-        } catch (err) { console.error(err)} 
-    }
-
     function handleSubmit() {
         let data = null;
         let validate = null;
@@ -119,17 +101,23 @@
                 title: title.value,
                 description: description.value
             };
+
+            if (props.content === 'edit task') {
+                data.task_id = props.taskId;
+            }
+
             validate = validateTaskdata(data.title);
         }
 
         if (!validate[0]) {
             alert(validate[1]);
         } else {
-            console.log('Form submitted, user data:', data);
+            console.log('Form submitted, form data:', data);
 
             if (props.content === 'sign up') signRequest('registration', data);
             if (props.content === 'sign in') signRequest('login', data);
-            if (props.content === 'create task') createTaskRequest(data);
+            if (props.content === 'create task') request('tasks/create_task', 'POST', data);
+            if (props.content === 'edit task') request('tasks/edit_task', 'PUT', data);
 
             emit('close');
             clearInputs();
@@ -151,6 +139,8 @@
     <div v-if="isVisible"  class="popup__container">
         <div v-if="content === 'sign in'" class="popup__header popup__part">Sign in</div>
         <div v-if="content === 'sign up'" class="popup__header popup__part">Sign up</div>
+        <div v-if="content === 'create task'" class="popup__header popup__part">Create task</div>
+        <div v-if="content === 'edit task'" class="popup__header popup__part">Edit task</div>
 
         <div class="popup__body popup__part">
 
@@ -165,7 +155,7 @@
                 <input v-model="password" type="password" placeholder="Password..." autocomplete="off" />
             </form>
 
-            <form v-if="content === 'create task'" action="">
+            <form v-if="content.includes('task')" action="">
                 <input v-model="title" placeholder="Title..." autocomplete="off" />
                 <input v-model="description" placeholder="Description..." autocomplete="off" />
             </form>
@@ -189,6 +179,7 @@
         transform: translate(-50%, -50%);
         background-color: #000;
         border-radius: 5px;
+        z-index: 999;
     }
 
     .popup__part {

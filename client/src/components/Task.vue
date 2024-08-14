@@ -1,5 +1,6 @@
 <script setup>
     import { ref } from 'vue';
+    import { request } from '../api/request.js';
 
     const props = defineProps({
         taskId: Number,
@@ -9,32 +10,7 @@
         completed: Number
     });
 
-    async function request(route, method, body) {
-        try {
-            const response = await fetch(`http://localhost:5174/tasks/${route}`, {
-                method: method,
-                headers: { 'Content-Type' : 'application/json' },
-                body: JSON.stringify(body)
-            });
-
-            const data = await response.json();
-
-            if (!data) { 
-                alert(`Error while ${route}! Empty response`);
-                return false;
-            }
-
-            if (data.code !== 200) { 
-                alert(`Error while ${route}, message: ${data.message}`);
-                return false;
-            }
-            
-            console.log(`Response while ${route} status: ${data}`);
-            return true;
-        } catch (err) {
-            console.error(err);
-        }
-    }
+    const emit = defineEmits(['showPopup', 'setContentPopup', 'setTaskid']);
 
     async function setComplete() {
         if (isComplete.value === 1) { isComplete.value = 0; }
@@ -55,16 +31,26 @@
         showModal.value = !showModal.value;
     }
 
-
     async function deleteTask() {
         const jwt = localStorage.getItem('JWT');
         const taskId = props.taskId;
         const body = { task_id: taskId, jwt: jwt };
 
-        await request('delete_task', 'DELETE', body);
+        await request('tasks/delete_task', 'DELETE', body);
 
         showModal.value = false;
         window.location.reload();
+    }
+
+    async function editTask() {
+        setTaskid(props.taskId);
+        emit('showPopup'); 
+        emit('setContentPopup', 'edit task'); 
+        showModal.value = false;
+    }
+
+    function setTaskid(value) {
+        emit('setTaskid', value);
     }
 
     const showModal = ref(false);
@@ -74,14 +60,21 @@
 <template>
     <div class="task__container">
         <div class="task__header">
-            <div @click="setShowModal" class="task__settings">...</div>
-            <div v-if="showModal === true" class="task__settings__modal__container">
-                <div class="task__settings__option">Edit</div>
-                <div @click="deleteTask" class="task__settings__option">Delete</div>
+            <div style="display: flex;">
+                <div @click="setShowModal" class="task__settings">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+                <div v-if="showModal === true" class="task__settings__modal__container">
+                    <div @click="editTask" class="task__settings__option">Edit</div>
+                    <div @click="deleteTask" class="task__settings__option">Delete</div>
+                </div>
+                <div @click="setComplete" class="task__complete">
+                    <div v-if="isComplete === 1" class="task__complete__value">X</div>
+                </div>
             </div>
-            <div @click="setComplete" class="task__complete">
-                <div v-if="isComplete === 1" class="task__complete__value">X</div>
-            </div>
+            
             <div class="task__title">{{ props.title }}</div>
         </div>
 
@@ -132,17 +125,24 @@
     }
 
     .task__settings {
-        width: fit-content;
-        height: fit-content;
-        transform: rotate(90deg);
+        margin: 0 0.5rem 0 0;
         position: relative;
         cursor: pointer;
     }
 
+    .dot {
+        width: 4px; 
+        height: 4px; 
+        background-color: white; 
+        border-radius: 50%; 
+        margin: 5px 0;
+    }
+
+
     .task__settings__modal__container {
         padding: 0.45rem;
         position: absolute;
-        margin: 5rem 0 0 -2rem;
+        margin: 2rem 0 0 -2rem;
         background-color: rgb(59, 56, 56);
         border-radius: 5px;
     }

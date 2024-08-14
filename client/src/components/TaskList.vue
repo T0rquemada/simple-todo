@@ -2,6 +2,24 @@
     import Task from './Task.vue';
     import { ref } from 'vue';
 
+    const props = defineProps({
+        contentPopup: String
+    });
+
+    const emit = defineEmits(['showPopup', 'setContentPopup', 'setTaskid']);
+
+    function showPopup() {
+        emit('showPopup');
+    }
+
+    function setContentPopup(content) {
+        emit('setContentPopup', content);
+    }
+
+    function setTaskid(value) {
+        emit('setTaskid', value);
+    }
+
     async function getTasks(userId) {
         const response = await fetch (`http://localhost:5174/tasks/get_tasks?jwt=${userId}`, {
             method: 'GET',
@@ -56,6 +74,9 @@
                     :description="task.description"
                     :userId="task.author_id"
                     :completed="task.completed"
+                    @showPopup="showPopup"
+                    @setContentPopup="setContentPopup"
+                    @setTaskid='setTaskid'
                 />
             </div>
         </template>
