@@ -36,7 +36,7 @@ You need two terminal tabs, to lauch web page, first for client, second for php 
 1. ```cd client```
 2. ```npm run dev```
 ### Server
-1. ```cd client```
+1. ```cd server```
 2. ```php -S localhost:5174 -t .```
 
 ## Used
