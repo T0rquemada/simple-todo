@@ -19,17 +19,14 @@
   }
 
   function setAuthenticated(value) {
-    console.log(`setAuthenticated: ${value}`);
     isAuthenticated.value = value;
   }
 
   function setContentPopup(value) {
-    console.log(`setContentPopup: ${value}`);
     contentPopup.value = value;
   }
 
   function setTaskid(value) {
-    console.log(`setTaskid: ${value}`);
     taskId.value = value;
   }
 

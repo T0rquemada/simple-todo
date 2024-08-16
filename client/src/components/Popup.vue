@@ -49,6 +49,7 @@
         //if (!email.includes('@')) return [false, "Email must contain '@'!"];
         //if (email.length < 3) return [false, 'Email must be longer than 2 characters!'];
         //if (password.length < 8) return [false, 'Password must be longer than 7 characters!'];
+        //if (password.length > 16) return [false, 'Password must be shorter than 17 characters!'];
         
         return [true];
     }
@@ -59,68 +60,47 @@
         return [true];
     }
 
-    async function signRequest(route, userData) {
-        try {
-            const response = await fetch(`http://localhost:5174/users/${route}`, {
-                method: 'POST',
-                headers: { 'Content-Type' : 'application/json' },
-                body: JSON.stringify(userData)
-            })
-            
-            if (!response.ok) { throw new Error('Network response was not ok'); }
-
-            const data = await response.json();
-
-            if (!data) throw new Error(`Error while ${route}! Empty response`);
-            if (data.code !== 200) throw new Error(`Error while ${route}: ${data.message}`);
-
-            console.log('Response from server while registration: ', data);
-
-            localStorage.setItem('JWT', data.jwt);
-            emit('setAuthenticated', true);
-        } catch (err) { alert(err); }
-    }
-
-    function handleSubmit() {
-        let data = null;
+    async function handleSubmit() {
+        let formData = null;
         let validate = null;
 
         if (props.content.includes('sign')) {
-            data = {
+            formData = {
                 email: email.value,
                 password: password.value,
             };
 
             if (props.content === 'sign up') {
-                data.username = username.value;
-                validate = validateUserdata(data.email, data.password, data.username);
-            } else { validate = validateUserdata(data.email, data.password); }
+                formData.username = username.value;
+                validate = validateUserdata(formData.email, formData.password, formData.username);
+            } else { validate = validateUserdata(formData.email, formData.password); }
         } else if (props.content.includes('task')) {
-            data = {
+            formData = {
                 jwt: localStorage.getItem('JWT'),
                 title: title.value,
                 description: description.value
             };
 
             if (props.content === 'edit task') {
-                data.task_id = props.taskId;
+                formData.task_id = props.taskId;
             }
 
-            validate = validateTaskdata(data.title);
+            validate = validateTaskdata(formData.title);
         }
 
         if (!validate[0]) {
             alert(validate[1]);
         } else {
-            console.log('Form submitted, form data:', data);
+            console.log('Form submitted, form data:', formData);
 
-            if (props.content === 'sign up') signRequest('registration', data);
-            if (props.content === 'sign in') signRequest('login', data);
-            if (props.content === 'create task') request('tasks/create_task', 'POST', data);
-            if (props.content === 'edit task') request('tasks/edit_task', 'PUT', data);
+            if (props.content === 'sign up') await request('users/registration', 'POST', formData, true, emit);
+            if (props.content === 'sign in') await request('users/login', 'POST', formData, true, emit);
+            if (props.content === 'create task') await request('tasks/create_task', 'POST', formData);
+            if (props.content === 'edit task') await request('tasks/edit_task', 'PUT', formData);
 
             emit('close');
             clearInputs();
+            window.location.reload();
         }
     }
 

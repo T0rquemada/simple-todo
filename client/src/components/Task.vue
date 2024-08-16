@@ -18,7 +18,7 @@
 
         const jwt = localStorage.getItem('JWT');
         const body = { task_id: props.taskId, complete: isComplete.value, jwt: jwt };
-        const result = await request('update_complete', 'PUT', body);
+        const result = await request('tasks/update_complete', 'PUT', body);
 
         // If request unsuccessful, return previous value
         if (!result) {

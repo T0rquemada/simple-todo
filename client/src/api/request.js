@@ -1,5 +1,4 @@
-// route = 'tasks/delete_task'
-export async function request(route, method, body) {
+export async function request(route, method, body, auth=false, emit=null) {
     try {
         const response = await fetch(`http://localhost:5174/${route}`, {
             method: method,
@@ -20,7 +19,13 @@ export async function request(route, method, body) {
         }
         
         console.log(`Response while ${route} status: ${data}`);
-        return true;
+        
+        if (auth && data.jwt && emit !== null) {
+            localStorage.setItem('JWT', data.jwt);
+            emit('setAuthenticated', true);
+        }
+
+        return true; // For Task.vue when set complete for task
     } catch (err) {
         console.error(err);
     }
