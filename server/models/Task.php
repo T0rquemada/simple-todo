@@ -40,8 +40,8 @@ class Task {
             $response = [ 'code' => 400, 'message' => 'Invalid task data' ];
         } else {
             $author_id = getUserIdFromJWT($data['jwt'], $this->secretKey);
-            $title = $data['title'];
-            $description = $data['description'];
+            $title = strip_tags($data['title']);
+            $description = strip_tags($data['description']);
             $completed = 0; // false by default
 
             # Inserting task in db
@@ -126,8 +126,8 @@ class Task {
             $response = [ 'code' => 400, 'message' => "Invalid data: 'title', 'description' and 'task_id' must be setted!" ];
         } else {
             $task_id = $data['task_id'];
-            $title = $data['title'];
-            $desc = $data['description'];
+            $title = strip_tags($data['title']);
+            $desc = strip_tags($data['description']);
 
             $stmt = $this->pdo->prepare('UPDATE tasks SET title=?, description=? WHERE id=?;');
             try {

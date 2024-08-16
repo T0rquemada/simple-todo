@@ -118,9 +118,9 @@ class User {
             http_response_code(400); 
             $response = [ 'code' => 400, 'message' => 'Invalid user data' ];
         } else {
-            $name = $userdata['username'];
+            $name = strip_tags($userdata['username']);
             $hashed_pass = password_hash($userdata['password'], PASSWORD_DEFAULT); # Hash user password
-            $email = $userdata['email'];
+            $email = strip_tags($userdata['email']);
 
             # Inserting user in db
             $stmt = $this->pdo->prepare('INSERT INTO users (username, password, email) VALUES (?, ?, ?)');

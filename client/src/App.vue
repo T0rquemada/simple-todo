@@ -58,7 +58,6 @@
       setAuthenticated(true);
     } catch (err) { 
       console.error('Auto login failed:', err); 
-      alert(err.message);
     }
   }
 
