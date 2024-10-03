@@ -23,6 +23,7 @@
     function handleEsc(event) {
         if (event.key === 'Escape') {
             emit('close');
+            clearInputs();
         }
     }
 
@@ -41,39 +42,14 @@
       description.value = '';
     };
 
-    function validateUserdata(email, password, username=undefined) {
-
-        if (email.includes(' ')) return [false, "Email can't contain spaces!"];
-        if (password.includes(' ')) return [false, "Password can't contein spaces!"];
-
-        //if (!email.includes('@')) return [false, "Email must contain '@'!"];
-        //if (email.length < 3) return [false, 'Email must be longer than 2 characters!'];
-        //if (password.length < 8) return [false, 'Password must be longer than 7 characters!'];
-        //if (password.length > 16) return [false, 'Password must be shorter than 17 characters!'];
-        
-        return [true];
-    }
-
-    function validateTaskdata(title) {
-        if (title.length < 3) return [false, 'Task title must be longer than 2 characters!'];
-
-        return [true];
-    }
-
     async function handleSubmit() {
         let formData = null;
-        let validate = null;
 
         if (props.content.includes('sign')) {
             formData = {
                 email: email.value,
                 password: password.value,
             };
-
-            if (props.content === 'sign up') {
-                formData.username = username.value;
-                validate = validateUserdata(formData.email, formData.password, formData.username);
-            } else { validate = validateUserdata(formData.email, formData.password); }
         } else if (props.content.includes('task')) {
             formData = {
                 jwt: localStorage.getItem('JWT'),
@@ -84,24 +60,18 @@
             if (props.content === 'edit task') {
                 formData.task_id = props.taskId;
             }
-
-            validate = validateTaskdata(formData.title);
         }
 
-        if (!validate[0]) {
-            alert(validate[1]);
-        } else {
-            console.log('Form submitted, form data:', formData);
+        console.log('Form submitted, form data:', formData);
 
-            if (props.content === 'sign up') await request('users/registration', 'POST', formData, true, emit);
-            if (props.content === 'sign in') await request('users/login', 'POST', formData, true, emit);
-            if (props.content === 'create task') await request('tasks/create_task', 'POST', formData);
-            if (props.content === 'edit task') await request('tasks/edit_task', 'PUT', formData);
+        if (props.content === 'sign up') await request('users/registration', 'POST', formData, true, emit);
+        if (props.content === 'sign in') await request('users/login', 'POST', formData, true, emit);
+        if (props.content === 'create task') await request('tasks/create_task', 'POST', formData);
+        if (props.content === 'edit task') await request('tasks/edit_task', 'PUT', formData);
 
-            emit('close');
-            clearInputs();
-            window.location.reload();
-        }
+        emit('close');
+        clearInputs();
+        //window.location.reload();
     }
 
     onMounted(() => {
@@ -117,35 +87,28 @@
 
 <template>
     <div v-if="isVisible"  class="popup__container">
-        <div v-if="content === 'sign in'" class="popup__header popup__part">Sign in</div>
-        <div v-if="content === 'sign up'" class="popup__header popup__part">Sign up</div>
-        <div v-if="content === 'create task'" class="popup__header popup__part">Create task</div>
-        <div v-if="content === 'edit task'" class="popup__header popup__part">Edit task</div>
+        <form  action="">
+            <div class="popup__header popup__part">
+                <div class="popup__title">{{ content[0].toUpperCase()+content.slice(1) }}</div>
+                <button @click="emit('close')">X</button>
+            </div>
+    
+            <div v-if="content.includes('task')" class="popup__body popup__part">
+                <input v-model="title" placeholder="Title..." autocomplete="off" required />
+                <input v-model="description" placeholder="Description..." autocomplete="off" required />
+            </div>
+            
+            <div v-else class="popup__body popup__part">
+                <input v-if="content === 'sign up'" v-model="username" placeholder="Username..." autocomplete="off" required />
+                <input v-model="email" type="email" placeholder="Email..." autocomplete="off" required />
+                <input v-model="password" type="password" placeholder="Password..." autocomplete="off" required />
+            </div>
 
-        <div class="popup__body popup__part">
-
-            <form v-if="content === 'sign in'" action="">
-                <input v-model="email" placeholder="Email..." autocomplete="off" />
-                <input v-model="password" type="password" placeholder="Password..." autocomplete="off" />
-            </form>
-
-            <form v-if="content === 'sign up'" action="">
-                <input v-model="username" placeholder="Username..." autocomplete="off" />
-                <input v-model="email" placeholder="Email..." autocomplete="off" />
-                <input v-model="password" type="password" placeholder="Password..." autocomplete="off" />
-            </form>
-
-            <form v-if="content.includes('task')" action="">
-                <input v-model="title" placeholder="Title..." autocomplete="off" />
-                <input v-model="description" placeholder="Description..." autocomplete="off" />
-            </form>
-
-        </div>
-
-        <div class="popup__footer popup__part">
-            <button @click="emit('close')" id="popup__closebtn popup" class="popup__btns">Close</button>
-            <button @click="handleSubmit" id="popup__submitbtn" class="popup__btns">Submit</button>
-        </div>
+            <div class="popup__footer popup__part">
+                <button @click="emit('close')" id="popup__closebtn popup" class="popup__btns">Close</button>
+                <button type="submit" @click="handleSubmit" id="popup__submitbtn" class="popup__btns">Submit</button>
+            </div>
+        </form>
     </div>
 </template>
 
@@ -162,28 +125,41 @@
         z-index: 999;
     }
 
-    .popup__part {
-        padding: 1rem;
-    }
-
     form {
         display: flex;
         flex-direction: column;
         align-items: center;
     }
 
+    .popup__part {
+        padding: 0.5rem 1rem;
+    }
+
+    .popup__header {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .popup__title {
+        font-weight: 700;
+        
+    }
+
     input {
         padding: 0.25rem;
         margin: 0.5rem;
-        width: 80%;
+        width: 90%;
         color: #000;
         border: none;
         border-radius: 3px;
     }
 
     .popup__footer {
+        width: 100%;
         display: flex;
-        justify-content: space-around;
+        justify-content: space-between;
     }
 
     .popup__btns {

@@ -17,24 +17,24 @@
     <header>
         <div class="page__title">ToDo</div>
         
-        <div class="header__btns" v-if="!isAuthenticated">
+        <div class="btn__container" v-if="!isAuthenticated">
             <button 
             @click="() => { emit('showPopup'); emit('setContentPopup', 'sign in'); }" 
-            class="header__btn">Sign in</button>
+            class="btn">Sign in</button>
 
             <button 
             @click="() => { emit('showPopup'); emit('setContentPopup', 'sign up'); }" 
-            class="header__btn">Sign up</button>
+            class="btn">Sign up</button>
         </div>
 
-        <div class="header__btns" v-if="isAuthenticated">
+        <div class="btn__container" v-if="isAuthenticated">
             <button 
             @click="() => { emit('showPopup'); emit('setContentPopup', 'create task'); }" 
-            class="header__btn">Create task</button>
+            class="btn">Create task</button>
 
             <button 
             @click="signOut" 
-            class="header__btn">Sign out</button>
+            class="btn">Sign out</button>
         </div>
     </header>
 </template>
@@ -48,19 +48,11 @@
 
     .page__title { user-select: none; }
 
-    .header__btns {
+    .btn__container {
         display: flex;
     }
 
-    .header__btns>* {
+    .btn__container>* {
         margin: 0 0.5rem;
-    }
-
-    .header__btn {
-        background-color: transparent;
-        border: none;
-        color: #fff;
-        cursor: pointer;
-        user-select: none;
     }
 </style>

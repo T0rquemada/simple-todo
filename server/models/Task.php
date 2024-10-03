@@ -37,7 +37,7 @@ class Task {
 
         if (!$correct_fields) {
             http_response_code(400);
-            $response = [ 'code' => 400, 'message' => 'Invalid task data' ];
+            $response = [ 'message' => 'Invalid task data' ];
         } else {
             $author_id = getUserIdFromJWT($data['jwt'], $this->secretKey);
             $title = strip_tags($data['title']);
@@ -49,10 +49,10 @@ class Task {
             try {
                 $result = $stmt->execute([$author_id, $title, $description, $completed]);
                 http_response_code(200);
-                $response = [ 'code' => 200, 'message' => 'Task inserted successfully'];
+                $response = ['message' => 'Task inserted successfully'];
             } catch (PDOException $e) {
                 http_response_code(500);
-                $response = [ 'code' => 500, 'message' => 'Database error: ' . $e->getMessage() ];
+                $response = [  'message' => 'Database error: ' . $e->getMessage() ];
             }
        }
 
@@ -62,13 +62,13 @@ class Task {
     public function get_tasks($jwt) {
         if (is_null($jwt)) {
             http_response_code(400);
-            $response = [ 'code' => 400, 'message' => 'JWT is null!'];
+            $response = [ 'message' => 'JWT is null!'];
         } else {
             $author_id = getUserIdFromJWT($jwt, $this->secretKey);
     
             if (is_null($author_id)) {
                 http_response_code(401);
-                $response = [ 'code' => 401,'message' => 'Invalid JWT: User ID is null!' ];
+                $response = [ 'message' => 'Invalid JWT: User ID is null!' ];
             } else {
                 $stmt = $this->pdo->prepare('SELECT * FROM tasks WHERE author_id = ?;');
                 
@@ -78,15 +78,15 @@ class Task {
     
                     if ($tasks) {
                         http_response_code(200);
-                        $response = ['code' => 200, 'message' => 'Tasks fetched successfully', 'tasks' => $tasks
+                        $response = ['message' => 'Tasks fetched successfully', 'tasks' => $tasks
                         ];
                     } else {
                         http_response_code(200); 
-                        $response = [ 'code' => 200, 'message' => 'No tasks found for this user.' ];
+                        $response = ['message' => 'No tasks found for this user.', 'tasks' => null ];
                     }
                 } catch (PDOException $e) {
                     http_response_code(500); 
-                    $response = [ 'code' => 500, 'message' => 'Database error: ' . $e->getMessage() ];
+                    $response = ['message' => 'Database error: ' . $e->getMessage() ];
                 }
             }
         }
@@ -99,7 +99,7 @@ class Task {
         $correct_fields = isset($data['task_id'], $data['complete']);
         if (!$correct_fields) {
             http_response_code(400); 
-            $response = [ 'code' => 400, 'message' => "Invalid data: 'completed' must be setted!" ];
+            $response = [  'message' => "Invalid data: 'completed' must be setted!" ];
         } else {
             $completed = $data['complete'];
             $task_id = $data['task_id'];
@@ -109,10 +109,10 @@ class Task {
                 $result = $stmt->execute([$completed, $task_id]);
                 
                 http_response_code(200); 
-                $response = ['code' => 200, 'message' => "Task updated!", 'completed' => $completed];
+                $response = [ 'message' => "Task updated!", 'completed' => $completed];
             } catch (PDOException $e) {
                 http_response_code(500); 
-                $response = [ 'code' => 500, 'message' => 'Database error: ' . $e->getMessage() ];
+                $response = [ 'message' => 'Database error: ' . $e->getMessage() ];
             }
        }
 
@@ -123,7 +123,7 @@ class Task {
         $correct_fields = isset($data['task_id'], $data['title'], $data['description']);
         if (!$correct_fields) {
             http_response_code(400); 
-            $response = [ 'code' => 400, 'message' => "Invalid data: 'title', 'description' and 'task_id' must be setted!" ];
+            $response = [ 'message' => "Invalid data: 'title', 'description' and 'task_id' must be setted!" ];
         } else {
             $task_id = $data['task_id'];
             $title = strip_tags($data['title']);
@@ -134,10 +134,10 @@ class Task {
                 $result = $stmt->execute([$title, $desc, $task_id]);
                 
                 http_response_code(200); 
-                $response = ['code' => 200, 'message' => "Task edited!"];
+                $response = ['message' => "Task edited!"];
             } catch (PDOException $e) {
                 http_response_code(500); 
-                $response = [ 'code' => 500, 'message' => 'Database error: ' . $e->getMessage() ];
+                $response = [ 'message' => 'Database error: ' . $e->getMessage() ];
             }
        }
 
@@ -149,7 +149,7 @@ class Task {
 
         if (!$correct_fields) {
             http_response_code(400); 
-            $response = [ 'code' => 400, 'message' => "Invalid data: 'task_id' must be setted!" ];
+            $response = [ 'message' => "Invalid data: 'task_id' must be setted!" ];
         } else {
             $task_id = $data['task_id'];
 
@@ -157,10 +157,10 @@ class Task {
             try {
                 $result = $stmt->execute([$task_id]);
                 http_response_code(200); 
-                $response = ['code' => 200, 'message' => "Task deleted!"];
+                $response = [ 'message' => "Task deleted!"];
             } catch (PDOException $e) {
                 http_response_code(500); 
-                $response = [ 'code' => 500, 'message' => 'Database error: ' . $e->getMessage() ];
+                $response = [ 'message' => 'Database error: ' . $e->getMessage() ];
             }
        }
 

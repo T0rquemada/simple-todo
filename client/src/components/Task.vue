@@ -17,6 +17,9 @@
         else if (isComplete.value === 0) { isComplete.value = 1; }
 
         const jwt = localStorage.getItem('JWT');
+
+        if (!jwt) { console.error('JWT not finded while setting task complete!'); return; }
+
         const body = { task_id: props.taskId, complete: isComplete.value, jwt: jwt };
         const result = await request('tasks/update_complete', 'PUT', body);
 

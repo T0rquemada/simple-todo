@@ -3,10 +3,32 @@
 * {
   color: #fff;
   font-size: 1.15rem;
+  margin: 0;
+  padding: 0;
 }
 
 body {
   padding: 1rem;;
+}
+
+/*Base HTML tags*/
+button {
+  border: none;
+  color: #fff;
+  background-color: transparent;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 10px;
+}
+
+.btn {
+  padding: 0.5rem;
+  transition: background-color 0.5s, color 0.3s;
+}
+
+.btn:hover {
+  color: #000;
+  background-color: #fff;
 }
 
 @media (max-width:45rem) {

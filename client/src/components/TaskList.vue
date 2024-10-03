@@ -20,28 +20,19 @@
         emit('setTaskid', value);
     }
 
-    async function getTasks(userId) {
-        const response = await fetch (`http://localhost:5174/tasks/get_tasks?jwt=${userId}`, {
+    async function getTasks(jwt) {
+        const response = await fetch (`http://localhost:5174/tasks/get_tasks?jwt=${jwt}`, {
             method: 'GET',
             headers: { 'Content-Type' : 'application/json' }
         });
 
         if (!response.ok) {
-            const errorData = await response.json();
-
-            if (errorData.code === 404) { console.error(errorData.message); } 
-            else { alert(errorData.message); }
-
-            throw new Error('Network response was not ok');
+            alert('Network response while fetching task was not ok');
+            return null;
         }
 
         const data = await response.json();
-
-        if (!data) throw new Error('Error while fetching tasks! Empty response');
-        if (data.code !== 200) throw new Error(`Error while fetching tasks: ${data.message}`);
         
-        console.log('Fetching tasks response:', data);
-
         return data.tasks;
     }
 
@@ -53,11 +44,9 @@
             if (!jwt) throw new Error('JWT not exist!');
 
             let fetchedTasks = await getTasks(jwt);
-            if (fetchedTasks === undefined) return; // If tasks not found, end proccess
+            if (!fetchedTasks) return; // If tasks not found, end proccess
 
             tasks.value = fetchedTasks;
-
-            console.log(tasks.value);
         } catch (error) { console.error('Error:', error); }
     })();
 </script>
@@ -87,9 +76,9 @@
 </template>
 
 <style scoped>
-.task__list__container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+    .task__list__container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
 </style>

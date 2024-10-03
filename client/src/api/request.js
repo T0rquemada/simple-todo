@@ -1,4 +1,8 @@
 export async function request(route, method, body, auth=false, emit=null) {
+    if (!route) throw new Error('Route for reqeust not provided!');
+    if (!method) throw new Error('Method for reqeust not provided!');
+    if (!body) throw new Error('Body for reqeust not provided!');
+
     try {
         const response = await fetch(`http://localhost:5174/${route}`, {
             method: method,
@@ -6,26 +10,20 @@ export async function request(route, method, body, auth=false, emit=null) {
             body: JSON.stringify(body)
         });
 
+        if (!response.ok) { alert(`Error while ${route}! Response not ok!`); return null; }
+
         const data = await response.json();
 
         if (!data) { 
             alert(`Error while ${route}! Empty response`);
-            return false;
         }
-
-        if (data.code !== 200) { 
-            alert(`Error while ${route}, message: ${data.message}`);
-            return false;
-        }
-        
-        console.log(`Response while ${route} status: ${data}`);
         
         if (auth && data.jwt && emit !== null) {
             localStorage.setItem('JWT', data.jwt);
             emit('setAuthenticated', true);
         }
 
-        return true; // For Task.vue when set complete for task
+        return data;
     } catch (err) {
         console.error(err);
     }

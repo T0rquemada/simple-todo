@@ -37,15 +37,30 @@ class UserController {
     }
 
     public function registration($userdata) {
-        $this->model->create($userdata);
+        if (empty($userdata['email']) || empty($userdata['password'] || empty($userdata['password']))) {
+            http_response_code(400);
+            return json_encode(['message' => 'Incorrect userdata while registration!']);
+        } else {
+            $this->model->create($userdata);
+        }
     }
 
     public function login($userdata) {
-        $this->model->login($userdata);
+        if (empty($userdata['email']) || empty($userdata['password'])) {
+            http_response_code(400);
+            return json_encode(['message' => 'Incorrect userdata while login!']);
+        } else {
+            $this->model->login($userdata);
+        }
     }
 
     public function autologin() {
         $jwt = getBearerToken();
+
+        if (empty($jwt)) {
+            http_response_code(400);
+            return json_encode(['message' => 'JWT not provided!']);
+        }
 
         if (validateJWT($jwt)) {
             $this->model->autologin($jwt);

@@ -33,9 +33,10 @@
   async function autologinRequest() {
     try {
       const jwt = localStorage.getItem('JWT');
+
       if (!jwt) {
         console.log('JWT not finded!'); 
-        throw new Error('JWT not found!');
+        return;
       }
       
       const response = await fetch('http://localhost:5174/users/autologin', {
@@ -49,13 +50,12 @@
       if (!response.ok) throw new Error('Network response was not ok');
 
       const data = await response.json();
-
-      if (!data) throw new Error('Error while registration! Empty response');
-      if (data.code !== 200) throw new Error(`Error while registration: ${data.message}`);
-      
-      console.log('Auto login response:', data);
-
-      setAuthenticated(true);
+      if (!data) {
+        console.error('Empty response while autologin');
+      } else {
+        console.log('Auto login response:', data);
+        setAuthenticated(true);
+      }
     } catch (err) { 
       console.error('Auto login failed:', err); 
     }
