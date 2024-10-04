@@ -157,7 +157,7 @@ class Task {
             try {
                 $result = $stmt->execute([$task_id]);
                 http_response_code(200); 
-                $response = [ 'message' => "Task deleted!"];
+                $response = [ 'status' => true, 'message' => "Task deleted!"];
             } catch (PDOException $e) {
                 http_response_code(500); 
                 $response = [ 'message' => 'Database error: ' . $e->getMessage() ];

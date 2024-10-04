@@ -1,5 +1,6 @@
 <script setup>
     import Task from './Task.vue';
+    import { request } from '../api/request.js';
     import { ref } from 'vue';
 
     const props = defineProps({
@@ -20,20 +21,15 @@
         emit('setTaskid', value);
     }
 
+    function handleTaskDeleted(taskId) {
+        tasks.value = tasks.value.filter(task => task.id !== taskId);
+    }
+
+
     async function getTasks(jwt) {
-        const response = await fetch (`http://localhost:5174/tasks/get_tasks?jwt=${jwt}`, {
-            method: 'GET',
-            headers: { 'Content-Type' : 'application/json' }
-        });
-
-        if (!response.ok) {
-            alert('Network response while fetching task was not ok');
-            return null;
-        }
-
-        const data = await response.json();
-        
-        return data.tasks;
+        let response = await request('tasks/get_tasks', 'GET', null, jwt);
+        if (!response.tasks) return null;
+        return response.tasks;
     }
 
     const tasks = ref([]);
@@ -66,6 +62,7 @@
                     @showPopup="showPopup"
                     @setContentPopup="setContentPopup"
                     @setTaskid='setTaskid'
+                    @taskDeleted="handleTaskDeleted"
                 />
             </div>
         </template>

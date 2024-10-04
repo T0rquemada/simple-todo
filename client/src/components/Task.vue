@@ -10,7 +10,7 @@
         completed: Number
     });
 
-    const emit = defineEmits(['showPopup', 'setContentPopup', 'setTaskid']);
+    const emit = defineEmits(['showPopup', 'setContentPopup', 'setTaskid', 'taskDeleted']);
 
     async function setComplete() {
         if (isComplete.value === 1) { isComplete.value = 0; }
@@ -37,12 +37,18 @@
     async function deleteTask() {
         const jwt = localStorage.getItem('JWT');
         const taskId = props.taskId;
-        const body = { task_id: taskId, jwt: jwt };
+        const body = { task_id: taskId };
 
-        await request('tasks/delete_task', 'DELETE', body);
+        let result = await request('tasks/delete_task', 'DELETE', body, jwt);
+        console.log(result.message);
 
-        showModal.value = false;
-        window.location.reload();
+        if (result.status) {
+            emit('taskDeleted', taskId);
+            showModal.value = false;
+        } else {
+            alert('Error while delete task, look console.logs');
+        }
+        
     }
 
     async function editTask() {
