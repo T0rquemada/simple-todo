@@ -22,21 +22,29 @@ class TaskRouter {
         $input = file_get_contents('php://input');
         $data = json_decode($input, true);
 
+        $headers = getallheaders();
+        if (!isset($headers['Authorization'])) {
+            http_response_code(400);
+            echo json_encode(['message' => 'JWT from headers not provided!']);
+            exit();
+        }
+        $token_field = $headers['Authorization'];
+        $jwt = str_replace('Bearer ', '', $token_field);
+
         if ($method === 'POST' && $uri === '/tasks/create_task') {
-            $this->middleware->handle($data['jwt']);
-            $this->controller->create($data);
+            $this->middleware->handle($jwt);
+            $this->controller->create($data, $jwt);
         } else if ($method === 'GET' && strpos($uri, '/tasks/get_tasks') === 0) {
-            $jwt = $_GET['jwt'];
             $this->middleware->handle($jwt);
             $this->controller->get_tasks($jwt);
         } else if ($method === 'PUT' && $uri === '/tasks/update_complete') {
-            $this->middleware->handle($data['jwt']);
+            $this->middleware->handle($jwt);
             $this->controller->update_complete($data);
         } else if ($method === 'PUT' && $uri === '/tasks/edit_task') {
-            $this->middleware->handle($data['jwt']);
+            $this->middleware->handle($jwt);
             $this->controller->edit_task($data);
         } else if ($method === 'DELETE' && $uri === '/tasks/delete_task') {
-            $this->middleware->handle($data['jwt']);
+            $this->middleware->handle($jwt);
             $this->controller->delete($data);
         } else {
             http_response_code(404);

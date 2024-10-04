@@ -5,7 +5,7 @@ require_once './env.php';
 use \Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
-// Check suer's JWT, if it's not correct - end up proccess
+// Check user's JWT, if it's not correct - end up proccess
 class AuthMiddleware {
     private $pdo;
     private $secretKey;

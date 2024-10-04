@@ -1,4 +1,4 @@
-export async function request(route, method, jwt=null, body=null ) {
+export async function request(route, method, body=null, jwt=null ) {
     if (!route) throw new Error('Route for request not provided!');
     if (!method) throw new Error('Method for reqeust not provided!');
     if (!body && method !== 'GET') throw new Error('Body for reqeust not provided!');
@@ -16,7 +16,11 @@ export async function request(route, method, jwt=null, body=null ) {
 
         const response = await fetch(`http://localhost:5174/${route}`, options);
 
-        if (!response.ok) { console.error(`Error while ${route}! Response not ok!`); return null; }
+        if (!response.ok) { 
+            const error = await response.json();
+            console.error(`Error while ${route}: ${error.message}`); 
+            return null; 
+        }
 
         const data = await response.json();
 

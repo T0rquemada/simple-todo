@@ -137,7 +137,7 @@ class User {
             }
         }
 
-        echo json_encode($response);
+        return json_encode($response);
     }
 
     public function login ($userdata) {
@@ -189,6 +189,6 @@ class User {
             $response = ['message' => 'Username not finded!', 'username' => null];
         }
 
-        echo json_encode($response);
+        return json_encode($response);
     }
 }

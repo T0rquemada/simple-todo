@@ -11,8 +11,8 @@ class TaskController {
         $this->model = new Task($pdo);
     }
 
-    public function create($data) {
-        $this->model->create($data);
+    public function create($data, $jwt) {
+        $this->model->create($data, $jwt);
     }
 
     public function get_tasks($jwt) {

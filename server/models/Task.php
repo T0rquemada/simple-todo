@@ -32,14 +32,14 @@ class Task {
         $this->secretKey = $_ENV['JWT'];
     }
 
-    public function create($data) {
-        $correct_fields = isset($data['jwt'], $data['title'], $data['description']);
+    public function create($data, $jwt) {
+        $correct_fields = isset($data['title']);
 
         if (!$correct_fields) {
             http_response_code(400);
             $response = [ 'message' => 'Invalid task data' ];
         } else {
-            $author_id = getUserIdFromJWT($data['jwt'], $this->secretKey);
+            $author_id = getUserIdFromJWT($jwt, $this->secretKey);
             $title = strip_tags($data['title']);
             $description = strip_tags($data['description']);
             $completed = 0; // false by default
