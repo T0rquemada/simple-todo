@@ -42,7 +42,8 @@
       description.value = '';
     };
 
-    async function handleSubmit() {
+    async function handleSubmit(event) {
+        event.preventDefault();
         let formData = null;
 
         if (props.content.includes('sign')) {
@@ -64,14 +65,25 @@
 
         console.log('Form submitted, form data:', formData);
 
-        if (props.content === 'sign up') await request('users/registration', 'POST', formData, true, emit);
-        if (props.content === 'sign in') await request('users/login', 'POST', formData, true, emit);
-        if (props.content === 'create task') await request('tasks/create_task', 'POST', formData);
-        if (props.content === 'edit task') await request('tasks/edit_task', 'PUT', formData);
+        let response;
 
-        emit('close');
-        clearInputs();
-        //window.location.reload();
+        if (props.content === 'sign up') response = await request('users/registration', 'POST', formData);
+        if (props.content === 'sign in') response = await request('users/login', 'POST', formData);
+        if (props.content === 'create task') response = await request('tasks/create_task', 'POST', formData);
+        if (props.content === 'edit task') response = await request('tasks/edit_task', 'PUT', formData);
+
+        if (response) {
+            if (response.jwt) {
+                localStorage.setItem('JWT', response.jwt);
+                emit('setAuthenticated', true);
+            }
+            
+            emit('close');
+            clearInputs();
+            //window.location.reload();
+        } else {
+            console.error('Error while receiving response')
+        }
     }
 
     onMounted(() => {
@@ -106,7 +118,7 @@
 
             <div class="popup__footer popup__part">
                 <button @click="emit('close')" id="popup__closebtn popup" class="popup__btns">Close</button>
-                <button type="submit" @click="handleSubmit" id="popup__submitbtn" class="popup__btns">Submit</button>
+                <button @click="handleSubmit" id="popup__submitbtn" class="popup__btns">Submit</button>
             </div>
         </form>
     </div>

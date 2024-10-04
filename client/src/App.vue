@@ -4,6 +4,7 @@
   import Popup from './components/Popup.vue'
   import Header from './components/Header.vue'
   import TaskList from './components/TaskList.vue'
+  import { request } from './api/request.js';
 
   const isAuthenticated = ref(false);
   const isPopupVisible = ref(false);
@@ -31,33 +32,12 @@
   }
 
   async function autologinRequest() {
-    try {
-      const jwt = localStorage.getItem('JWT');
+    const jwt = localStorage.getItem('JWT');
+    let response = await request('users/autologin', 'GET', jwt);
 
-      if (!jwt) {
-        console.log('JWT not finded!'); 
-        return;
-      }
-      
-      const response = await fetch('http://localhost:5174/users/autologin', {
-        method: 'POST',
-        headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${jwt}`
-        }
-      });
-
-      if (!response.ok) throw new Error('Network response was not ok');
-
-      const data = await response.json();
-      if (!data) {
-        console.error('Empty response while autologin');
-      } else {
-        console.log('Auto login response:', data);
-        setAuthenticated(true);
-      }
-    } catch (err) { 
-      console.error('Auto login failed:', err); 
+    if (response) {
+      console.log('Auto login response:', response);
+      setAuthenticated(true);
     }
   }
 

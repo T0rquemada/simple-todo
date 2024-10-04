@@ -1,27 +1,24 @@
-export async function request(route, method, body, auth=false, emit=null) {
-    if (!route) throw new Error('Route for reqeust not provided!');
+export async function request(route, method, jwt=null, body=null ) {
+    if (!route) throw new Error('Route for request not provided!');
     if (!method) throw new Error('Method for reqeust not provided!');
-    if (!body) throw new Error('Body for reqeust not provided!');
+    if (!body && method !== 'GET') throw new Error('Body for reqeust not provided!');
 
     try {
-        const response = await fetch(`http://localhost:5174/${route}`, {
-            method: method,
-            headers: { 'Content-Type' : 'application/json' },
-            body: JSON.stringify(body)
-        });
+        let headers = { 'Content-Type' : 'application/json' };
+        if (jwt) headers['Authorization'] = `Bearer ${jwt}`;
 
-        if (!response.ok) { alert(`Error while ${route}! Response not ok!`); return null; }
+        let options = {
+            method: method,
+            headers: headers
+        }
+
+        if (body) options.body = JSON.stringify(body);
+
+        const response = await fetch(`http://localhost:5174/${route}`, options);
+
+        if (!response.ok) { console.error(`Error while ${route}! Response not ok!`); return null; }
 
         const data = await response.json();
-
-        if (!data) { 
-            alert(`Error while ${route}! Empty response`);
-        }
-        
-        if (auth && data.jwt && emit !== null) {
-            localStorage.setItem('JWT', data.jwt);
-            emit('setAuthenticated', true);
-        }
 
         return data;
     } catch (err) {

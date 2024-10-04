@@ -142,7 +142,7 @@ class User {
 
     public function login ($userdata) {
         $correct_fields = isset($userdata['password'], $userdata['email']);
-        print_r($userdata);
+        
         if (!$this->validateUserdata($userdata) && $correct_fields) {
             http_response_code(400); 
             $response = ['message' => 'Invalid user data' ];

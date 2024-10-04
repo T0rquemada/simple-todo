@@ -18,7 +18,7 @@ class AuthMiddleware {
     public function handle($jwt) {
         if (!$jwt) {
             http_response_code(401);
-            echo json_encode(['code' => 401, 'message' => 'Unauthorized: JWT not provided']);
+            echo json_encode(['message' => 'Unauthorized: JWT not provided']);
             exit();
         }
 
@@ -34,12 +34,12 @@ class AuthMiddleware {
 
             if (!$user || !password_verify($password, $user['password'])) {
                 http_response_code(401);
-                echo json_encode(['code' => 401, 'message' => 'Unauthorized: Invalid credentials']);
+                echo json_encode(['message' => 'Unauthorized: Invalid credentials']);
                 exit();
             }
         } catch (Exception $e) {
             http_response_code(401);
-            echo json_encode(['code' => 401, 'message' => 'Unauthorized: Invalid JWT']);
+            echo json_encode(['message' => 'Unauthorized: Invalid JWT']);
             exit();
         }
     }

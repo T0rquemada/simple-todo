@@ -20,13 +20,13 @@ class UserRouter {
             $this->controller->registration($userdata);
         } else if ($method === 'POST' && $uri === '/users/login') {
             $this->controller->login($userdata);
-        } else if ($method === 'POST' && $uri === '/users/autologin') {
+        } else if ($method === 'GET' && $uri === '/users/autologin') {
             $this->controller->autologin();
         } else if ($method === 'GET' && strpos($uri, '/users/get_username') === 0) {
             $this->controller->get_username();
         } else {
-            header('HTTP/1.1 404 Not Found');
-            echo json_encode(['code' => 404, 'message' => 'Route not found']);
+            http_response_code(404);
+            echo json_encode(['message' => 'Route not found']);
         }
     }
 }
