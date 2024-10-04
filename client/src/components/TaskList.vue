@@ -1,13 +1,7 @@
 <script setup>
     import Task from './Task.vue';
-    import { request } from '../api/request.js';
-    import { ref } from 'vue';
-
-    const props = defineProps({
-        contentPopup: String
-    });
-
-    const emit = defineEmits(['showPopup', 'setContentPopup', 'setTaskid']);
+    import { useStore } from 'vuex';
+    import { onMounted, computed } from 'vue';
 
     function showPopup() {
         emit('showPopup');
@@ -21,55 +15,35 @@
         emit('setTaskid', value);
     }
 
-    function handleTaskDeleted(taskId) {
-        tasks.value = tasks.value.filter(task => task.id !== taskId);
-    }
+    const props = defineProps({
+        contentPopup: String
+    });
 
+    const emit = defineEmits(['showPopup', 'setContentPopup', 'setTaskid']);
 
-    async function getTasks(jwt) {
-        let response = await request('tasks/get_tasks', 'GET', null, jwt);
-        if (!response.tasks) return null;
-        return response.tasks;
-    }
+    const store = useStore();
+    const tasks = computed(() => store.state.tasks);
 
-    const tasks = ref([]);
-
-    (async () => {
-        try {
-            let jwt = localStorage.getItem('JWT');
-            if (!jwt) throw new Error('JWT not exist!');
-
-            let fetchedTasks = await getTasks(jwt);
-            if (!fetchedTasks) return; // If tasks not found, end proccess
-
-            tasks.value = fetchedTasks;
-        } catch (error) { console.error('Error:', error); }
-    })();
+    onMounted(async () => {
+        await store.dispatch('refreshTasks');
+    });
 </script>
 
 <template>
-    <Suspense>
-        <template #default>
-            <div class="task__list__container">
-                <Task 
-                    v-for="task in tasks"
-                    :key="task.id"
-                    :taskId="task.id"
-                    :title="task.title"
-                    :description="task.description"
-                    :userId="task.author_id"
-                    :completed="task.completed"
-                    @showPopup="showPopup"
-                    @setContentPopup="setContentPopup"
-                    @setTaskid='setTaskid'
-                    @taskDeleted="handleTaskDeleted"
-                />
-            </div>
-        </template>
-        <template #fallback>
-            <div>Loading...</div>
-        </template>
-    </Suspense>
+    <div class="task__list__container">
+        <Task 
+            v-for="task in tasks"
+            :key="task.id"
+            :taskId="task.id"
+            :title="task.title"
+            :description="task.description"
+            :userId="task.author_id"
+            :completed="task.completed"
+            @showPopup="showPopup"
+            @setContentPopup="setContentPopup"
+            @setTaskid='setTaskid'
+        />
+    </div>
 </template>
 
 <style scoped>

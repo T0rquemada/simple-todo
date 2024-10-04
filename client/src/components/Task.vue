@@ -1,5 +1,6 @@
 <script setup>
     import { ref } from 'vue';
+    import { useStore } from 'vuex';
     import { request } from '../api/request.js';
 
     const props = defineProps({
@@ -10,7 +11,8 @@
         completed: Number
     });
 
-    const emit = defineEmits(['showPopup', 'setContentPopup', 'setTaskid', 'taskDeleted']);
+    const emit = defineEmits(['showPopup', 'setContentPopup', 'setTaskid']);
+    const store = useStore();
 
     async function setComplete() {
         if (isComplete.value === 1) { isComplete.value = 0; }
@@ -43,7 +45,7 @@
         console.log(result.message);
 
         if (result.status) {
-            emit('taskDeleted', taskId);
+            await store.dispatch('refreshTasks');
             showModal.value = false;
         } else {
             alert('Error while delete task, look console.logs');

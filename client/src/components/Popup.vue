@@ -1,5 +1,6 @@
 <script setup>
     import { ref, onMounted, onUnmounted } from 'vue';
+    import { useStore } from 'vuex';
     import { request } from '../api/request.js';
 
     const props = defineProps({
@@ -9,6 +10,7 @@
         taskId: Number
     });
 
+    const store = useStore();
     const emit = defineEmits(['close', 'setAuthenticated']);
 
     // Input's field setup
@@ -45,6 +47,7 @@
     async function handleSubmit(event) {
         event.preventDefault();
         let formData = null;
+        let jwt = null;
 
         if (props.content.includes('sign')) {
             formData = {
@@ -53,10 +56,11 @@
             };
         } else if (props.content.includes('task')) {
             formData = {
-                jwt: localStorage.getItem('JWT'),
                 title: title.value,
                 description: description.value
             };
+
+            jwt = localStorage.getItem('JWT');
 
             if (props.content === 'edit task') {
                 formData.task_id = props.taskId;
@@ -69,8 +73,8 @@
 
         if (props.content === 'sign up') response = await request('users/registration', 'POST', formData);
         if (props.content === 'sign in') response = await request('users/login', 'POST', formData);
-        if (props.content === 'create task') response = await request('tasks/create_task', 'POST', formData);
-        if (props.content === 'edit task') response = await request('tasks/edit_task', 'PUT', formData);
+        if (props.content === 'create task') response = await request('tasks/create_task', 'POST', formData, jwt);
+        if (props.content === 'edit task') response = await request('tasks/edit_task', 'PUT', formData, jwt);
 
         if (response) {
             if (response.jwt) {
@@ -78,9 +82,9 @@
                 emit('setAuthenticated', true);
             }
             
+            if (props.content.includes('task')) await store.dispatch('refreshTasks');
             emit('close');
             clearInputs();
-            //window.location.reload();
         } else {
             console.error('Error while receiving response')
         }
